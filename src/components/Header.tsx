@@ -40,8 +40,13 @@ export default function Header() {
             className="h-16 w-20 object-contain sm:h-20 sm:w-28 lg:h-24 lg:w-32"
             priority
           />
-          <span className="hidden text-xl font-bold tracking-tight text-brand-dark sm:block md:text-2xl lg:text-3xl">
-            Отель Атлантик
+          <span className="hidden flex-col sm:flex">
+            <span className="text-xl font-bold leading-tight tracking-tight text-brand-dark md:text-2xl lg:text-3xl">
+              Отель Атлантик
+            </span>
+            <span className="text-xs font-medium tracking-wide text-foreground/60 md:text-sm">
+              п. Утес &middot; Алушта
+            </span>
           </span>
         </Link>
 
@@ -129,11 +134,6 @@ export default function Header() {
               Гости
             </Link>
           </li>
-          <li>
-            <Link href="/video" className={`hover:text-brand ${pathname === "/video" ? "text-brand" : ""}`}>
-              Видео
-            </Link>
-          </li>
         </ul>
       </nav>
 
@@ -167,9 +167,6 @@ export default function Header() {
           </ul>
           <Link href="/guests" className="block rounded-lg px-2 py-2 hover:bg-black/5" onClick={() => setMobileOpen(false)}>
             Гости
-          </Link>
-          <Link href="/video" className="block rounded-lg px-2 py-2 hover:bg-black/5" onClick={() => setMobileOpen(false)}>
-            Видео
           </Link>
           <div className="mt-2 space-y-1 border-t border-black/5 pt-3 text-sm">
             {site.phones.map((p, i) => (

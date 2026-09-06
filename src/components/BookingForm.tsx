@@ -8,8 +8,31 @@ function toDateInputValue(d: Date) {
   return d.toISOString().slice(0, 10);
 }
 
+function todayLocal() {
+  const now = new Date();
+  return toDateInputValue(new Date(now.getTime() - now.getTimezoneOffset() * 60000));
+}
+
+function nightsBetween(from: string, to: string) {
+  const a = new Date(`${from}T00:00:00Z`);
+  const b = new Date(`${to}T00:00:00Z`);
+  return Math.round((b.getTime() - a.getTime()) / 86400000);
+}
+
+function pluralNights(n: number) {
+  const mod10 = n % 10;
+  const mod100 = n % 100;
+  if (mod10 === 1 && mod100 !== 11) return "ночь";
+  if ([2, 3, 4].includes(mod10) && ![12, 13, 14].includes(mod100)) return "ночи";
+  return "ночей";
+}
+
 export default function BookingForm() {
   const [action, setAction] = useState<string | undefined>(undefined);
+  // BookingForm only ever mounts client-side (BookingModal gates it behind
+  // `open`, which starts false), so there's no server/client render to
+  // mismatch here — safe to compute directly instead of via effect+state.
+  const [minDate1] = useState(todayLocal);
   const [date1, setDate1] = useState("");
   const [date2, setDate2] = useState("");
   const [minDate2, setMinDate2] = useState<string | undefined>(undefined);
@@ -22,14 +45,16 @@ export default function BookingForm() {
   function handleDate1Change(value: string) {
     setDate1(value);
     if (!value) return;
-    const min = new Date(value);
-    min.setUTCDate(min.getUTCDate() + 2);
+    const min = new Date(`${value}T00:00:00Z`);
+    min.setUTCDate(min.getUTCDate() + 1);
     const minStr = toDateInputValue(min);
     setMinDate2(minStr);
     if (!date2 || date2 < minStr) {
       setDate2(minStr);
     }
   }
+
+  const nights = date1 && date2 ? nightsBetween(date1, date2) : 0;
 
   return (
     <form
@@ -110,8 +135,6 @@ export default function BookingForm() {
         </select>
       </div>
 
-      <p className="text-sm text-foreground/60">Бронирование возможно от 2х суток</p>
-
       <div className="grid grid-cols-2 gap-3">
         <div>
           <label htmlFor="date1" className="mb-1 block text-sm font-medium text-foreground/80">
@@ -121,6 +144,7 @@ export default function BookingForm() {
             id="date1"
             name="date1"
             type="date"
+            min={minDate1}
             value={date1}
             onChange={(e) => handleDate1Change(e.target.value)}
             className="w-full rounded-lg border border-black/15 px-3 py-2 focus:border-brand focus:outline-none"
@@ -141,6 +165,12 @@ export default function BookingForm() {
           />
         </div>
       </div>
+
+      {nights > 0 && (
+        <p className="text-sm font-medium text-brand-dark">
+          {nights} {pluralNights(nights)}
+        </p>
+      )}
 
       <div>
         <label htmlFor="email" className="mb-1 block text-sm font-medium text-foreground/80">

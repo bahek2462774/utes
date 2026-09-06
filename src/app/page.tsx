@@ -3,7 +3,7 @@ import Link from "next/link";
 import Gallery from "@/components/Gallery";
 import ExcursionsCard from "@/components/ExcursionsCard";
 import { rooms } from "@/lib/rooms";
-import { homeContent } from "@/lib/site";
+import { homeContent, videoEmbedId } from "@/lib/site";
 import BookNowButton from "@/components/BookNowButton";
 
 export default function HomePage() {
@@ -55,7 +55,9 @@ export default function HomePage() {
       </section>
 
       <section className="container-page space-y-4 py-12">
-        <h2 className="text-2xl font-bold text-brand-dark">О нас</h2>
+        <h2 className="text-2xl font-bold text-brand-dark">
+          Приветствуем Вас на официальном сайте отеля &laquo;Атлантик&raquo;
+        </h2>
         {homeContent.intro.map((p) => (
           <p key={p.slice(0, 20)} className="leading-relaxed text-foreground/80">
             {p}
@@ -125,27 +127,19 @@ export default function HomePage() {
           </div>
         ))}
 
-        <Link
-          href="/video"
-          className="group block overflow-hidden rounded-2xl border border-black/10"
-        >
-          <div className="relative aspect-video">
-            <Image
-              src="/images/video-cover.png"
-              alt="Видео об Утесе"
-              fill
-              sizes="100vw"
-              className="object-cover transition duration-300 group-hover:scale-105"
-            />
-            <div className="absolute inset-0 flex items-center justify-center bg-black/30">
-              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-white/90">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="ml-1 h-7 w-7 text-brand-dark">
-                  <path d="M8 5v14l11-7z" />
-                </svg>
-              </div>
+        <div>
+          <h2 className="mb-4 text-2xl font-bold text-brand-dark">Видео об Утесе</h2>
+          <div className="overflow-hidden rounded-2xl border border-black/10">
+            <div className="relative aspect-video">
+              <iframe
+                src={`https://www.youtube.com/embed/${videoEmbedId}`}
+                title="Видео об Утесе - Отель Атлантик"
+                allowFullScreen
+                className="absolute inset-0 h-full w-full"
+              />
             </div>
           </div>
-        </Link>
+        </div>
       </section>
     </div>
   );

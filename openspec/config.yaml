@@ -41,7 +41,9 @@ context: |
   - `src/app/` — Next.js App Router pages: `/` (home), `/contacts`, `/price`,
     `/rooms` (listing), `/rooms/[slug]` (5 static room pages generated via
     `generateStaticParams`: vip-big, vip-small, luks-ug, standart-ug,
-    standart-sever), `/guests`, `/video`.
+    standart-sever), `/guests`. There is no standalone `/video` route — the
+    hotel's YouTube video is embedded directly at the bottom of the home page
+    (`videoEmbedId` in `src/lib/site.ts`).
   - `src/components/` — Header (sticky nav incl. desktop rooms dropdown + mobile
     menu), Footer, Gallery (click-to-open lightbox), BookingForm + BookingModal
     (the booking form, opened from a floating button or the homepage CTA),
