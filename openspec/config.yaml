@@ -43,12 +43,25 @@ context: |
     `generateStaticParams`: vip-big, vip-small, luks-ug, standart-ug,
     standart-sever), `/guests`. There is no standalone `/video` route — the
     hotel's YouTube video is embedded directly at the bottom of the home page
-    (`videoEmbedId` in `src/lib/site.ts`).
+    (`videoEmbedId` in `src/lib/site.ts`). Legal/compliance pages: `/privacy`
+    (Политика обработки персональных данных, ст. 18.1 152-ФЗ), `/consent`
+    (Согласие на обработку персональных данных — deliberately a separate
+    document/URL from /privacy per ст. 9 152-ФЗ as amended by 156-ФЗ,
+    effective 01.09.2025), `/cookies` (Политика использования cookie).
   - `src/components/` — Header (sticky nav incl. desktop rooms dropdown + mobile
-    menu), Footer, Gallery (click-to-open lightbox), BookingForm + BookingModal
-    (the booking form, opened from a floating button or the homepage CTA),
-    BookNowButton, YandexMap (click-to-load embed on /contacts),
-    ExcursionsCard, RoomAmenitiesCard.
+    menu), Footer (site nav + legal links + operator requisites — the latter
+    are placeholders, see `src/lib/legal.ts`), Gallery (click-to-open
+    lightbox), BookingForm + BookingModal (the booking form, opened from a
+    floating button or the homepage CTA; the consent checkbox links to
+    /consent and /privacy and stamps a `consent_datetime` hidden field on
+    submit), BookNowButton, YandexMap (click-to-load embed on /contacts),
+    ExcursionsCard, RoomAmenitiesCard, CookieBanner (localStorage-dismissed
+    notice linking to /cookies).
+  - `src/lib/legal.ts` — placeholder operator identity (legal entity name,
+    ИНН, ОГРН/ОГРНИП, legal address) used across the three legal pages and
+    the footer. These are NOT real values — see the "Legal/compliance"
+    section below; do not remove the placeholder markers without the real
+    values in hand.
   - `src/lib/rooms.ts` — all 5 rooms' data: nav labels, page titles/meta
     descriptions (kept byte-identical to the live site's `<title>`/meta tags,
     including its original typos/odd spacing — this was an explicit requirement),
@@ -75,12 +88,46 @@ context: |
     double-spaces and existing typos (e.g. "берегу моя" on the standart-sever
     room page) — this was an explicit, deliberate instruction from the project
     owner, not an oversight.
-  - The booking form's field set, its `method="post"`, its delayed
-    (~5s `setTimeout`) `action` assignment to `https://utesatlantic.ru/mail2.php`,
-    and its "checkout date = check-in + 2 days minimum" JS logic all mirror the
-    original site's actual behavior and must not be simplified away.
+  - The booking form's field set, its `method="post"`, and its delayed
+    (~5s `setTimeout`) `action` assignment to `https://utesatlantic.ru/mail2.php`
+    mirror the original site's actual mechanics and must not be simplified
+    away. The minimum-stay logic itself is a deliberate departure from the
+    original (which enforced 2 nights) — the project owner asked for it to
+    require only 1 night minimum, with check-in unable to be in the past and
+    a live nights-count readout; don't revert this to match the original.
   - Phone numbers (+7 978 842-55-60, +7 978 068-27-17, in that order) and the
     email hotelatlantic@mail.ru must match the live site exactly.
+
+  ## Legal/compliance (RF law, added 2026)
+
+  Researched against 2025-2026 amendments to 152-ФЗ and related law (multi-agent
+  legal research pass, see chat history for full sourcing — this is a summary,
+  not a substitute for it). Status:
+
+  - **Done on-site**: `/privacy`, `/consent`, `/cookies` pages exist; the
+    booking form's consent checkbox links to /consent and /privacy and is
+    unchecked by default; a cookie notice (`CookieBanner`) links to /cookies;
+    the footer links all three plus shows an operator-requisites line.
+  - **NOT done, needs the actual hotel owner** (I don't have and shouldn't
+    guess these): (1) `src/lib/legal.ts` `operator` fields are placeholders —
+    need the real legal entity name (ИП/ООО), ИНН, ОГРН/ОГРНИП, legal
+    address; replace them and re-deploy once known. (2) Filing the
+    уведомление об обработке персональных данных with Roskomnadzor
+    (pd.rkn.gov.ru) — this requires the owner's actual registration info and
+    an authenticated submission; it can't be done from this repo. (3)
+    Confirming the mailbox that receives booking-form submissions is hosted
+    in RF (data-localization risk extends to where the email itself lands,
+    not just the web server) — hosting/VPS location was already confirmed
+    fine, but the receiving mailbox wasn't separately verified.
+  - **Explicitly researched and found NOT required** for this site's current
+    setup: WCAG/ГОСТ Р 52872 accessibility compliance (voluntary for private
+    business), a full "Публичная оферта" document (the booking form is a
+    request-only flow, not an instant online contract — a short disclaimer
+    next to the form covers the risk instead, already added).
+  - **Gray zone, flagged not resolved**: whether the homepage's self-promo
+    banner ("Цены снижены") needs erid ad-marking via an ОРД. Multiple
+    sourced opinions disagree; cheapest safe option if it matters is
+    registering it for free under an ОРД's "самореклама" flow.
 
   ## Deployment
 

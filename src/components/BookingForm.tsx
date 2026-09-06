@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { bookingRoomOptions } from "@/lib/rooms";
 import { site } from "@/lib/site";
@@ -56,12 +57,18 @@ export default function BookingForm() {
 
   const nights = date1 && date2 ? nightsBetween(date1, date2) : 0;
 
+  function stampConsentTime(e: React.FormEvent<HTMLFormElement>) {
+    const field = e.currentTarget.elements.namedItem("consent_datetime");
+    if (field instanceof HTMLInputElement) field.value = new Date().toISOString();
+  }
+
   return (
     <form
       className="myf box space-y-4"
       id="myform"
       method="post"
       action={action}
+      onSubmit={stampConsentTime}
     >
       <div>
         <label htmlFor="fio" className="mb-1 block text-sm font-medium text-foreground/80">
@@ -240,6 +247,8 @@ export default function BookingForm() {
         />
       </div>
 
+      <input type="hidden" name="consent_datetime" defaultValue="" />
+
       <div className="flex items-start gap-2">
         <input
           autoComplete="off"
@@ -250,9 +259,22 @@ export default function BookingForm() {
           className="mt-1"
         />
         <label htmlFor="politics" className="text-sm text-foreground/70">
-          Нажимая на кнопку &quot;Отправить&quot;, я даю согласие на обработку персональных данных.
+          Нажимая на кнопку &quot;Отправить&quot;, я даю{" "}
+          <Link href="/consent" target="_blank" className="text-brand hover:underline">
+            согласие на обработку персональных данных
+          </Link>{" "}
+          в соответствии с{" "}
+          <Link href="/privacy" target="_blank" className="text-brand hover:underline">
+            Политикой конфиденциальности
+          </Link>
+          .
         </label>
       </div>
+
+      <p className="text-xs text-foreground/50">
+        Это заявка на бронирование, а не подтверждённая бронь: мы свяжемся с Вами по указанным
+        контактам, чтобы подтвердить наличие номера и детали. Оплата через сайт не производится.
+      </p>
 
       <button
         type="submit"

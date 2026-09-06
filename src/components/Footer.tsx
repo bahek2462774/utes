@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { site } from "@/lib/site";
+import { operator } from "@/lib/legal";
 
 export default function Footer() {
   return (
@@ -42,11 +43,28 @@ export default function Footer() {
       </div>
 
       <div className="border-t border-white/10 py-4">
-        <div className="container-page flex flex-col items-center justify-between gap-2 text-xs text-white/50 sm:flex-row">
+        <div className="container-page flex flex-col items-center gap-3 text-xs text-white/50 sm:flex-row sm:justify-between">
           <p>&copy; {new Date().getFullYear()} Отель Атлантик</p>
-          <Link href="/contacts" className="hover:text-white">
-            Контакты
-          </Link>
+          <nav className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1">
+            <Link href="/contacts" className="hover:text-white">
+              Контакты
+            </Link>
+            <Link href="/privacy" className="hover:text-white">
+              Политика конфиденциальности
+            </Link>
+            <Link href="/consent" className="hover:text-white">
+              Согласие на обработку данных
+            </Link>
+            <Link href="/cookies" className="hover:text-white">
+              Cookie
+            </Link>
+          </nav>
+        </div>
+        <div className="container-page mt-3 border-t border-white/10 pt-3 text-[11px] leading-relaxed text-white/40">
+          <p>
+            Исполнитель: {operator.name}, ИНН {operator.inn}, ОГРН/ОГРНИП {operator.ogrn},
+            адрес: {operator.legalAddress}.
+          </p>
         </div>
       </div>
     </footer>
