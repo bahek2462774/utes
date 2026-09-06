@@ -1,0 +1,113 @@
+schema: spec-driven
+
+# Project context (optional)
+# This is shown to AI when creating artifacts.
+# Add your tech stack, conventions, style guides, domain knowledge, etc.
+context: |
+  ## What this project is
+
+  A from-scratch clone/rebuild of the real hotel website https://utesatlantic.ru/
+  ("Отель Атлантик" — a small private hotel in Krym, settlement Utes near Alushta).
+  The original site is an old Joomla install (yoo_tasty template, PHP 5.6). This
+  project reproduces its content and functionality on a modern static stack, styled
+  with Tailwind instead of the original template CSS.
+
+  Original task (verbatim intent from the project owner):
+  - Rebuild https://utesatlantic.ru/ so it is functionally and content-identical
+    (same pages, same text, same photos, same booking form behavior) but restyled
+    with Tailwind CSS.
+  - Ship as a fully static site (Next.js `output: "export"` — pre-rendered HTML,
+    no Node server needed at runtime).
+  - Keep the contact/booking form submitting to the ORIGINAL site's PHP backend
+    (`https://utesatlantic.ru/mail2.php`) — we do not run our own mail backend.
+  - Use the real, original hotel logo image (not a redesigned one).
+  - Must look good on both desktop and mobile.
+  - Deployed over FTP to a small VPS, served at http://utes2.duckdns.org/.
+
+  ## Tech stack
+
+  - Next.js 16 (App Router), TypeScript, React 19
+  - Tailwind CSS v4 (`@import "tailwindcss"` in `src/app/globals.css`, custom
+    `--brand` / `--brand-dark` / `--sand` theme tokens)
+  - Static export only: `next.config.ts` sets `output: "export"` and
+    `images: { unoptimized: true }` — there is no Next.js server in production,
+    the build output in `out/` is plain static HTML/CSS/JS/images.
+  - No test framework, no CMS, no database. All page content is hand-transcribed
+    from the live site into TypeScript data modules (see below) — there is no CMS
+    or admin UI; editing content means editing these files directly.
+
+  ## Structure
+
+  - `src/app/` — Next.js App Router pages: `/` (home), `/contacts`, `/price`,
+    `/rooms` (listing), `/rooms/[slug]` (5 static room pages generated via
+    `generateStaticParams`: vip-big, vip-small, luks-ug, standart-ug,
+    standart-sever), `/guests`, `/video`.
+  - `src/components/` — Header (sticky nav incl. desktop rooms dropdown + mobile
+    menu), Footer, Gallery (click-to-open lightbox), BookingForm + BookingModal
+    (the booking form, opened from a floating button or the homepage CTA),
+    BookNowButton, YandexMap (click-to-load embed on /contacts),
+    ExcursionsCard, RoomAmenitiesCard.
+  - `src/lib/rooms.ts` — all 5 rooms' data: nav labels, page titles/meta
+    descriptions (kept byte-identical to the live site's `<title>`/meta tags,
+    including its original typos/odd spacing — this was an explicit requirement),
+    amenity lists, gallery image paths, and the shared "Во всех номерах / В
+    стоимость номера входит / Платные услуги" info block.
+  - `src/lib/site.ts` — site-wide data: phones, email, address, Yandex map
+    coordinates, the price table, homepage copy, the "К Вашим услугам"
+    excursions block, the booking form's target endpoint.
+  - `public/images/` — all photos, resized/recompressed from the originals
+    (originals were ~127MB total; resized to a 1600px-long-edge cap, ~35MB) and
+    renamed to clean ASCII paths (the source filenames were Cyrillic with spaces/
+    parens, which round-tripped badly through URLs). `public/images/logo.png` is
+    the untouched original hotel logo.
+  - Favicons in `public/` (favicon.ico, favicon-*.png, apple-touch-icon.png,
+    android-chrome-*.png, mstile-150x150.png, site.webmanifest,
+    browserconfig.xml) were all generated FROM `public/images/logo.png` (see
+    `metadata.icons` / `metadata.manifest` in `src/app/layout.tsx`) — not copied
+    from the original site.
+
+  ## Content-fidelity rules (important — don't relax these without asking)
+
+  - Page `<title>` and meta description text must match the live site's raw
+    `<title>`/`<meta name="description">` byte-for-byte, including its quirky
+    double-spaces and existing typos (e.g. "берегу моя" on the standart-sever
+    room page) — this was an explicit, deliberate instruction from the project
+    owner, not an oversight.
+  - The booking form's field set, its `method="post"`, its delayed
+    (~5s `setTimeout`) `action` assignment to `https://utesatlantic.ru/mail2.php`,
+    and its "checkout date = check-in + 2 days minimum" JS logic all mirror the
+    original site's actual behavior and must not be simplified away.
+  - Phone numbers (+7 978 842-55-60, +7 978 068-27-17, in that order) and the
+    email hotelatlantic@mail.ru must match the live site exactly.
+
+  ## Deployment
+
+  Static export (`npm run build` → `out/`) is uploaded via FTP to a VPS whose
+  document root is served at http://utes2.duckdns.org/. FTP host/credentials and
+  the upload process are documented in `deploy/README.md` (git-tracked
+  deliberately — see that file for why). There is no CI/CD; deploys are manual:
+  build locally, then re-upload the contents of `out/`.
+
+# Per-artifact rules (optional)
+rules:
+  proposal:
+    - Keep proposals short and concrete — this is a small single-owner site, not
+      an enterprise project. No need for elaborate stakeholder/rollout sections.
+  tasks:
+    - Every content change (text, prices, photos) must state which live page it
+      was verified against, since content-fidelity to https://utesatlantic.ru/
+      is a hard requirement for this project.
+
+# Per-operation guidance (optional)
+operations:
+  apply:
+    guidance:
+      - After any content or booking-form change, run `npm run build` and
+        `npm run lint` — this project ships as a static export, so a broken
+        build means a broken deploy.
+      - If a change touches page text, prices, or contact details, diff it
+        against the live https://utesatlantic.ru/ page it corresponds to.
+  archive:
+    guidance:
+      - Note in the archive summary whether the change requires a redeploy
+        (re-running the FTP upload documented in deploy/README.md).
