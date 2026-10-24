@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Gallery from "@/components/Gallery";
-import BookNowButton from "@/components/BookNowButton";
 import RoomAmenitiesCard from "@/components/RoomAmenitiesCard";
 import { getRoom, rooms } from "@/lib/rooms";
 
@@ -51,8 +50,6 @@ export default async function RoomPage({
           </div>
         ))}
       </div>
-
-      <BookNowButton />
 
       <div className="mt-10">
         <RoomAmenitiesCard />

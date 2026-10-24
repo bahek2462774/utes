@@ -19,8 +19,10 @@ file is the map to find things, not a duplicate of them.
 
 A static (Next.js `output: "export"`) rebuild of the real hotel site
 https://utesatlantic.ru/, styled with Tailwind, deployed by FTP to
-http://utes2.duckdns.org/. There is no backend here — the booking form posts
-straight to the original site's PHP mailer. Full detail: `openspec/config.yaml`
+https://utesatlantic.ru/. There is no backend here. The booking form was
+removed for the off-season (see the archived OpenSpec change
+`remove-booking-form`), so the site is informational only for now. Full
+detail: `openspec/config.yaml`
 (`context:` field) and `README.md`.
 
 ## Before you touch content
@@ -89,6 +91,12 @@ brochure site) — `build` + `lint` + a manual check against the live original
 is the verification loop.
 
 ## Deploying
+
+Production is https://utesatlantic.ru/. Deploys run from the static-sites
+workspace: `python3 _tools/ftp_deploy.py utes` after `npm run build`, with the
+connection settings kept outside this repo (see `../AGENTS.md`). The rest of
+this section describes the older test-host flow in `deploy/`, kept until the
+owner decides about removing it.
 
 Manual, no CI: `npm run build` produces `out/`; upload its contents over FTP to
 the host's document root. Credentials and the exact upload command are in

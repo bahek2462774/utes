@@ -20,9 +20,14 @@ context: |
     no Node server needed at runtime).
   - Keep the contact/booking form submitting to the ORIGINAL site's PHP backend
     (`https://utesatlantic.ru/mail2.php`) — we do not run our own mail backend.
+    STATUS 2026-10-24: the form and every booking button were removed for the
+    off-season (OpenSpec change `remove-booking-form`, archived under
+    `openspec/changes/archive/`). Form-related notes below describe what
+    existed and what to respect when it is restored; they are not live now.
   - Use the real, original hotel logo image (not a redesigned one).
   - Must look good on both desktop and mobile.
-  - Deployed over FTP to a small VPS, served at http://utes2.duckdns.org/.
+  - Deployed over FTP; production is https://utesatlantic.ru/ (the earlier test
+    host utes2.duckdns.org is retired).
 
   ## Tech stack
 
@@ -42,8 +47,14 @@ context: |
     `/rooms` (listing), `/rooms/[slug]` (5 static room pages generated via
     `generateStaticParams`: vip-big, vip-small, luks-ug, standart-ug,
     standart-sever), `/guests`. There is no standalone `/video` route — the
-    hotel's YouTube video is embedded directly at the bottom of the home page
-    (`videoEmbedId` in `src/lib/site.ts`). Legal/compliance pages: `/privacy`
+    hotel's video is played at the bottom of the home page from our own server
+    (`video` in `src/lib/site.ts`, file `public/video/utes.mp4`, 480p H.264,
+    about 39 MB, faststart). YouTube is blocked in Russia, so it is not
+    embedded. The player is `video.js` 8.24.1 (core build plus the Russian
+    language pack), loaded lazily by `src/components/VideoPlayer.tsx` only when
+    the section nears the viewport. The site loads no third-party scripts,
+    styles or fonts; the only external resource is the Yandex map iframe on
+    `/contacts`, which loads after a click. Keep it that way. Legal/compliance pages: `/privacy`
     (Политика обработки персональных данных, ст. 18.1 152-ФЗ), `/consent`
     (Согласие на обработку персональных данных — deliberately a separate
     document/URL from /privacy per ст. 9 152-ФЗ as amended by 156-ФЗ,
@@ -51,12 +62,11 @@ context: |
   - `src/components/` — Header (sticky nav incl. desktop rooms dropdown + mobile
     menu), Footer (site nav + legal links + operator requisites — the latter
     are placeholders, see `src/lib/legal.ts`), Gallery (click-to-open
-    lightbox), BookingForm + BookingModal (the booking form, opened from a
-    floating button or the homepage CTA; the consent checkbox links to
-    /consent and /privacy and stamps a `consent_datetime` hidden field on
-    submit), BookNowButton, YandexMap (click-to-load embed on /contacts),
-    ExcursionsCard, RoomAmenitiesCard, CookieBanner (localStorage-dismissed
-    notice linking to /cookies).
+    lightbox), YandexMap (click-to-load embed on /contacts), ExcursionsCard,
+    RoomAmenitiesCard, CookieBanner (localStorage-dismissed notice linking to
+    /cookies). The booking form components (BookingForm, BookingModal,
+    BookNowButton) were deleted on 2026-10-24; recover them from git history
+    (`git log --diff-filter=D --name-only -- src/components/BookingForm.tsx`).
   - `src/lib/legal.ts` — placeholder operator identity (legal entity name,
     ИНН, ОГРН/ОГРНИП, legal address) used across the three legal pages and
     the footer. These are NOT real values — see the "Legal/compliance"
@@ -69,7 +79,7 @@ context: |
     стоимость номера входит / Платные услуги" info block.
   - `src/lib/site.ts` — site-wide data: phones, email, address, Yandex map
     coordinates, the price table, homepage copy, the "К Вашим услугам"
-    excursions block, the booking form's target endpoint.
+    excursions block.
   - `public/images/` — all photos, resized/recompressed from the originals
     (originals were ~127MB total; resized to a 1600px-long-edge cap, ~35MB) and
     renamed to clean ASCII paths (the source filenames were Cyrillic with spaces/
@@ -88,9 +98,10 @@ context: |
     double-spaces and existing typos (e.g. "берегу моя" on the standart-sever
     room page) — this was an explicit, deliberate instruction from the project
     owner, not an oversight.
-  - The booking form's field set, its `method="post"`, and its delayed
-    (~5s `setTimeout`) `action` assignment to `https://utesatlantic.ru/mail2.php`
-    mirror the original site's actual mechanics and must not be simplified
+  - When the booking form is restored (it is removed now): its field set,
+    its `method="post"`, and its delayed (~5s `setTimeout`) `action`
+    assignment to `https://utesatlantic.ru/mail2.php` mirror the original
+    site's actual mechanics and must not be simplified
     away. The minimum-stay logic itself is a deliberate departure from the
     original (which enforced 2 nights) — the project owner asked for it to
     require only 1 night minimum, with check-in unable to be in the past and
@@ -104,10 +115,11 @@ context: |
   legal research pass, see chat history for full sourcing — this is a summary,
   not a substitute for it). Status:
 
-  - **Done on-site**: `/privacy`, `/consent`, `/cookies` pages exist; the
-    booking form's consent checkbox links to /consent and /privacy and is
-    unchecked by default; a cookie notice (`CookieBanner`) links to /cookies;
-    the footer links all three plus shows an operator-requisites line.
+  - **Done on-site**: `/privacy`, `/consent`, `/cookies` pages exist; a cookie
+    notice (`CookieBanner`) links to /cookies; the footer links all three plus
+    shows an operator-requisites line. The booking form (its consent checkbox
+    linked to /consent and /privacy and was unchecked by default) is removed
+    for now; /privacy and /consent still describe it on purpose.
   - **NOT done, needs the actual hotel owner** (I don't have and shouldn't
     guess these): (1) `src/lib/legal.ts` `operator` fields are placeholders —
     need the real legal entity name (ИП/ООО), ИНН, ОГРН/ОГРНИП, legal
@@ -115,7 +127,7 @@ context: |
     уведомление об обработке персональных данных with Roskomnadzor
     (pd.rkn.gov.ru) — this requires the owner's actual registration info and
     an authenticated submission; it can't be done from this repo. (3)
-    Confirming the mailbox that receives booking-form submissions is hosted
+    When the form returns, confirming the mailbox that receives its submissions is hosted
     in RF (data-localization risk extends to where the email itself lands,
     not just the web server) — hosting/VPS location was already confirmed
     fine, but the receiving mailbox wasn't separately verified.
@@ -124,18 +136,25 @@ context: |
     business), a full "Публичная оферта" document (the booking form is a
     request-only flow, not an instant online contract — a short disclaimer
     next to the form covers the risk instead, already added).
-  - **Gray zone, flagged not resolved**: whether the homepage's self-promo
-    banner ("Цены снижены") needs erid ad-marking via an ОРД. Multiple
-    sourced opinions disagree; cheapest safe option if it matters is
+  - **Gray zone, currently moot**: the site-wide self-promo banner ("Цены
+    2026 снижены") was removed on 2026-10-24 when the season ended. If a promo
+    banner comes back, the question of erid ad-marking via an ОРД comes back
+    with it: sourced opinions disagree, and the cheapest safe option is
     registering it for free under an ОРД's "самореклама" flow.
 
   ## Deployment
 
-  Static export (`npm run build` → `out/`) is uploaded via FTP to a VPS whose
-  document root is served at http://utes2.duckdns.org/. FTP host/credentials and
-  the upload process are documented in `deploy/README.md` (git-tracked
-  deliberately — see that file for why). There is no CI/CD; deploys are manual:
-  build locally, then re-upload the contents of `out/`.
+  Static export (`npm run build` produces `out/`) is uploaded via FTP; the FTP account
+  root is the web root of https://utesatlantic.ru/ (first production deploy
+  2026-10-24). Deploys run from the static-sites workspace with
+  `python3 _tools/ftp_deploy.py utes`; the connection settings live outside
+  this repo and are never committed. The deploy keeps the remote `.htaccess`
+  (the old Joomla install's redirects from hotelatlantic.com.ua and www to
+  utesatlantic.ru still work through it) and deletes any other remote file
+  that is not in `out/`. The older `deploy/` folder in this repo is the
+  previous test-host flow, kept until the owner decides to remove it (its
+  FTP credentials, base64-encoded, are in git history). There is no CI/CD;
+  deploys are manual: build locally, then run the tool.
 
 # Per-artifact rules (optional)
 rules:

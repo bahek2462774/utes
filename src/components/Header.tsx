@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { rooms } from "@/lib/rooms";
-import { site, topBanner } from "@/lib/site";
+import { site } from "@/lib/site";
 
 const navLinks = [
   { href: "/contacts", label: "Контакты", sub: "Телефоны, карта" },
@@ -22,14 +22,6 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-30 bg-white shadow-sm">
-      <div className="bg-brand text-center text-white">
-        <Link href={topBanner.href} className="container-page flex flex-col items-center gap-1 py-2 text-sm sm:flex-row sm:justify-center sm:gap-3">
-          <span className="font-semibold">{topBanner.title}</span>
-          <span className="hidden sm:inline">{topBanner.subtitle}</span>
-          <span className="underline underline-offset-2">{topBanner.cta}</span>
-        </Link>
-      </div>
-
       <div className="container-page flex items-center justify-between gap-4 py-3">
         <Link href="/" className="flex shrink-0 items-center gap-3">
           <Image

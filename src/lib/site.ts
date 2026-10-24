@@ -6,7 +6,6 @@ export const site = {
   address: ["г. Алушта, п. Утес", "кооператив Утес", "ул. Княгини Гагариной 25/1"],
   yandexMapUrl: "http://maps.yandex.ru/?um=u7RxTAMgAnYf56JedaJOcoFFlEoDthMP&l=map",
   mapCoords: [44.593902, 34.370838] as [number, number],
-  bookingEndpoint: "https://utesatlantic.ru/mail2.php",
 };
 
 export const priceTable = {
@@ -89,11 +88,8 @@ export const excursions = {
   ],
 };
 
-export const videoEmbedId = "kGZJUxxRH8c";
-
-export const topBanner = {
-  title: "Цены 2026 снижены!",
-  subtitle: "Успейте забронировать по новым ценам",
-  cta: "Смотреть цены 2026",
-  href: "/price",
+export const video = {
+  title: "Видео об Утесе - Отель Атлантик",
+  src: "/video/utes.mp4",
+  poster: "/video/utes-poster.jpg",
 };

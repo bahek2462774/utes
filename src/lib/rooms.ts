@@ -173,16 +173,6 @@ export function getRoom(slug: string): Room | undefined {
   return rooms.find((r) => r.slug === slug);
 }
 
-export const bookingRoomOptions = [
-  { value: "2-х комнатный номер VIP (Big) (панорамный)", label: "2-х комнатный номер VIP (Big)" },
-  { value: "2-х комнатный номер VIP (Small)", label: "2-х комнатный номер VIP (Small)" },
-  { value: "2-х комнатный ЛЮКС", label: "2-х комнатный ЛЮКС" },
-  { value: "1-но комнатный 2-х местный номер Юг (пляж)", label: "1-но комнатный 2-х местный номер Юг (пляж)" },
-  { value: "1-но комнатный 2-х местный номер Юг (море)", label: "1-но комнатный 2-х местный номер Юг (море)" },
-  { value: "1-но комнатный 2-х местный номер Север", label: "1-но комнатный 2-х местный номер Север" },
-  { value: "Одноместный (Север)", label: "Одноместный (Север)" },
-];
-
 export const roomAmenitiesInfo = {
   allRooms: ["Охраняемая сигнализация", "Wi-fi"],
   included: [

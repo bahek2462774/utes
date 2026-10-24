@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { priceTable } from "@/lib/site";
-import BookNowButton from "@/components/BookNowButton";
 import RoomAmenitiesCard from "@/components/RoomAmenitiesCard";
 
 export const metadata: Metadata = {
@@ -65,8 +64,6 @@ export default function PricePage() {
           <p key={n}>{n}</p>
         ))}
       </div>
-
-      <BookNowButton />
 
       <div className="mt-12">
         <RoomAmenitiesCard />

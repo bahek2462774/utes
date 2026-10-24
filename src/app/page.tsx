@@ -2,9 +2,9 @@ import Image from "next/image";
 import Link from "next/link";
 import Gallery from "@/components/Gallery";
 import ExcursionsCard from "@/components/ExcursionsCard";
+import VideoPlayer from "@/components/VideoPlayer";
 import { rooms } from "@/lib/rooms";
-import { homeContent, videoEmbedId } from "@/lib/site";
-import BookNowButton from "@/components/BookNowButton";
+import { homeContent, video } from "@/lib/site";
 
 export default function HomePage() {
   return (
@@ -29,7 +29,6 @@ export default function HomePage() {
           <p className="mt-4 max-w-lg text-white/85">
             5 метров от моря. Уютные номера, ресторан с видом на море и собственный пляж.
           </p>
-          <BookNowButton />
         </div>
       </section>
 
@@ -129,16 +128,7 @@ export default function HomePage() {
 
         <div>
           <h2 className="mb-4 text-2xl font-bold text-brand-dark">Видео об Утесе</h2>
-          <div className="overflow-hidden rounded-2xl border border-black/10">
-            <div className="relative aspect-video">
-              <iframe
-                src={`https://www.youtube.com/embed/${videoEmbedId}`}
-                title="Видео об Утесе - Отель Атлантик"
-                allowFullScreen
-                className="absolute inset-0 h-full w-full"
-              />
-            </div>
-          </div>
+          <VideoPlayer src={video.src} poster={video.poster} title={video.title} />
         </div>
       </section>
     </div>
